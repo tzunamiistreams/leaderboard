@@ -44,7 +44,7 @@
 			function init() {
 				if(!window.settings) alert("Daten konnten nicht abgerufen werden.");
 				
-				var iFrameSrc = "https://yntrend.pw/leaderboard/?id=" + window.channelId + "_" + window.settings.start + "_" + window.settings.end + "&title=Top%20Zuschauer%20letzte%2030%20Tage";
+				var iFrameSrc = "https://yntrend.pw/leaderboard/?id=" + window.channelId + "_" + window.settings.start + "_" + window.settings.end + "&title=" + encodeURIComponent(window.settings.headline2);
 				
 				$("#leaderboardiFrame").attr("src", iFrameSrc);
 				$("#headline").html(window.settings.headline1);
