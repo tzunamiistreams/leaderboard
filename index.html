@@ -2,6 +2,14 @@
 	<head>
 		<title>Tzunamii's Leaderboard</title>
 		<link href="https://fonts.googleapis.com/css?family=Fredoka+One" rel="stylesheet">
+		<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+		<script>
+			function setGlobal(settings) {
+				window.settings = JSON.parse(settings.data.content);
+				window.channelId = settings.data.id;
+			}
+		</script>
+		<script src="https://yntrend.pw/api/v1/toolkit/getSharedSettings?id=37331634&callback=setGlobal"></script>
 		<style>
 			body {
 				font-family: 'Fredoka One', cursive;
@@ -16,15 +24,117 @@
 			  	display: block;
 				height: 80%;
 			}
+			
+			#editControls {
+				margin: 0px auto;
+				margin-top: 20px;
+				font-size: 0.9em;
+			}
+			
+			.hidden {
+				display: none;
+			}
+			
+			.hint {
+				font-family: serif;
+				font-size: 0.95em;
+			}
 		</style>
+		<script>
+			function init() {
+				if(!window.settings) alert("Daten konnten nicht abgerufen werden.");
+				
+				var iFrameSrc = "https://yntrend.pw/leaderboard/?id=" + window.channelId + "_" + window.settings.start + "_" + window.settings.end + "&title=Top%20Zuschauer%20letzte%2030%20Tage";
+				
+				$("#leaderboardiFrame").attr("src", iFrameSrc);
+				$("#headline").html(window.settings.headline1);
+				$("#description").html(window.settings.description.replace(/(?:\r\n|\r|\n)/g, '<br>'));
+				
+			
+				var url = new URL(window.location.href);
+				var editModeEnabled = url.searchParams.get("edit") === "1" ? true : false;
+				if(editModeEnabled) window.editModeKey = url.searchParams.get("key");
+				
+				if(editModeEnabled && window.editModeKey) {
+					$("body").prepend('<span style="color: red;">Bearbeitungsmodus aktiv - Diesen Link NICHT weitergeben!</span>');
+					$("#editControls").removeClass("hidden");
+					$("#headline1Edit").val(window.settings.headline1);
+					$("#headline2Edit").val(window.settings.headline2);
+					$("#descriptionEdit").val(window.settings.description);
+					
+					$("#challengeStartEdit").val(window.settings.start);
+					$("#challengeEndEdit").val(window.settings.end);
+				}
+			}
+			
+			function saveSettings() {
+				window.settings.headline1 = $("#headline1Edit").val();
+				window.settings.headline2 = $("#headline2Edit").val();
+				
+				window.settings.description = $("#descriptionEdit").val();
+			
+				window.settings.start = $("#challengeStartEdit").val();
+				window.settings.end = $("#challengeEndEdit").val();
+				
+				$.ajax({
+					type: "POST",
+					url: "https://yntrend.pw/api/v1/toolkit/setSharedSettings",
+					data: {
+						id: window.channelId, 
+						key: window.editModeKey, 
+						content: JSON.stringify(window.settings) 
+					},
+					success: function() {
+						window.location = window.location.href.split('?')[0];
+					},
+				});
+			}
+			
+			$(document).ready(init);
+		</script>
 	</head>
 	
 	<body>
-		<h1>Tzunamii's Leaderboard</h1>
-		<div>Hier werden die aktivsten User gelistet<br>Am Ende des Monats erhält der User auf Platz 1 ein exklusives Geschenk :)</div>
-		<br>
-		<div>
-			<iframe src="https://yntrend.pw/leaderboard/?id=37331634_30_now&title=Top%20Zuschauer%20letzte%2030%20Tage" width="100%" frameborder="0" iframeresizable="" class="mobile-max-width"></iframe>
+		<table id="editControls" class="hidden">
+			<tr>
+				<td></td>
+				<td>Texte</td>
+			</tr>
+			<tr>
+				<td align="right">Überschrift:</td>
+				<td><input type="text" id="headline1Edit" size="40"></td>
+			</tr>
+			<tr>
+				<td align="right" valign="top">Beschreibung:</td>
+				<td><textarea id="descriptionEdit" cols="42" rows="5"></textarea></td>
+			</tr>
+			<tr>
+				<td align="right">Überschrift Top-Liste:</td>
+				<td><input type="text" id="headline2Edit" size="40"></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><br>Zeitraum des Leaderboards</td>
+			</tr>
+			<tr>
+				<td align="right" valign="top">Challenge Start:</td>
+				<td><input type="text" id="challengeStartEdit" size="40"><br><span class="hint">Letzte Tage (z.B. 30) oder Datum</span></td>
+			</tr>
+			<tr>
+				<td align="right" valign="top">Challenge Ende:</td>
+				<td><input type="text" id="challengeEndEdit" size="40"><br><span class="hint">Bis Jetzt (now) oder Datum
+				<br>Datumsformat: Jahr-Monat-Tag Stunde:Minute:Sekunde<br>(z.B. 2019-03-30 00:00:00)</span></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><input type="button" id="saveButton" value="Speichern" onClick="saveSettings()"></td>
+			</tr>
+		</table>
+		
+		<h1 id="headline"></h1>
+		<div id="description"></div><br>
+		<div id="leaderboardframe">
+			<iframe id="leaderboardiFrame" width="100%" frameborder="0" iframeresizable="" class="mobile-max-width"></iframe>
 		</div>
 	</body>
 </html>
