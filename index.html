@@ -9,7 +9,7 @@
 				window.channelId = settings.data.id;
 			}
 		</script>
-		<script src="https://yntrend.pw/api/v1/toolkit/getSharedSettings?id=37331634&callback=setGlobal"></script>
+		<script src="https://junau.zerody.one/api/v1/toolkit/getSharedSettings?id=37331634&callback=setGlobal"></script>
 		<style>
 			body {
 				font-family: 'Fredoka One', cursive;
@@ -44,7 +44,7 @@
 			function init() {
 				if(!window.settings) alert("Daten konnten nicht abgerufen werden.");
 				
-				var iFrameSrc = "https://yntrend.pw/leaderboard/?id=" + window.channelId + "_" + window.settings.start + "_" + window.settings.end + "&title=" + encodeURIComponent(window.settings.headline2);
+				var iFrameSrc = "https://junau.zerody.one/leaderboard/?id=" + window.channelId + "_" + window.settings.start + "_" + window.settings.end + "&title=" + encodeURIComponent(window.settings.headline2);
 				
 				$("#leaderboardiFrame").attr("src", iFrameSrc);
 				$("#headline").html(window.settings.headline1);
@@ -78,7 +78,7 @@
 				
 				$.ajax({
 					type: "POST",
-					url: "https://yntrend.pw/api/v1/toolkit/setSharedSettings",
+					url: "https://junau.zerody.one/api/v1/toolkit/setSharedSettings",
 					data: {
 						id: window.channelId, 
 						key: window.editModeKey, 
